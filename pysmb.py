@@ -8,18 +8,6 @@ import logging
 import time
 import uuid
 
-
-logging.basicConfig(level=logging.DEBUG)
-
-log = logging.getLogger("pysmb")
-
-# Server Settings
-SERVER_NAME = ""
-USERNAME = ""
-PASSWORD = ""
-DOMAIN = ""
-SHARE_NAME = ""
-
 server_profiles = []
 
 ignored_directories = []
@@ -27,6 +15,14 @@ ignored_directories = []
 valid_extensions = []
 
 isTest = False
+
+
+class SERVER_PROFILE:
+    SERVER_NAME = ""
+    USERNAME = ""
+    PASSWORD = ""
+    DOMAIN = ""
+    SHARE_NAME = ""
 
 
 def format_timestamp(timestamp):
@@ -116,9 +112,13 @@ def create_new_server_profile(server_profiles):
             }
             profiles.append(newProfile)
 
-        data = {"profiles": profiles, "ignored-directories": ignored_directories}
-
-        print(data)
+        data = {
+            "profiles": profiles,
+            "ignored-directories": ignored_directories,
+            "output-directory": output_directory,
+            "test-directory": "",
+            "valid-extensions": valid_extensions,
+        }
         write_config(data)
     else:
         print("Can't connect!")
@@ -134,6 +134,9 @@ def read_config():
     with open("/Users/james/Desktop/pysmb/smb-configs.json", "r") as profilesFile:
         data = json.load(profilesFile)
     return data
+
+
+# def edit_existing_server_profile():
 
 
 def get_existing_server_profile(server_profiles):
@@ -199,121 +202,103 @@ def create_new_directory(share, new_path_name):
         print("Cannot create a new directory")
 
 
-def move_file(SHARE_NAME, original_file_path, get_output_directory, timestamp):
-    log.debug(f'moving file at: "{original_file_path}" to "{new_file_path}"')
+def move_file(SHARE_NAME, original_file_path, output_directory, filename, timestamp):
+    log.debug(f'moving file at: "{original_file_path}"')
 
-    # if copy_number == 0:
-    #     try:
-    #         conn.rename(SHARE_NAME, original_file_path, new_file_path)
+    random_uuid = uuid.uuid4()
 
-    #     except:
-    #         move_file(SHARE_NAME, original_file_path, new_file_path, copy_number=1)
-    # else:
-    #     try:
-    #         conn.rename(SHARE_NAME, original_file_path, new_file_path)
-    #     except:
-    #         move_file(
-    #             SHARE_NAME,
-    #             original_file_path,
-    #             new_file_path,
-    #             copy_number=copy_number + 1,
-    #         )
+    new_path = f"{output_directory}/{timestamp[1]}/{timestamp[0]}/{timestamp[2]}"
+    new_file_name = (
+        f"{timestamp[1]}-{timestamp[0]}-{timestamp[2]}-{random_uuid}-{filename}"
+    )
+
+    print(f"Moving to: {new_path}/{new_file_name}")
+
+    try:
+        conn.rename(SHARE_NAME, original_file_path, f"{new_path}/{new_file_name}")
+    except:
+        conn.rename(SHARE_NAME, original_file_path, f"{new_path}/copy-{new_file_name}")
 
 
-def loop_through_path(basePath):
-    print(f"\nPassed base path: {basePath}")
-    for path in conn.listPath(SHARE_NAME, basePath):
+def loop_through_path(passed_path, SHARE_NAME):
+
+    print(f"\nPassed base path: {passed_path}")
+
+    # loop through the paths that are listed with the given passed path
+    for path in conn.listPath(SHARE_NAME, passed_path):
+
+        # Don't go through hidden paths/files
         if path.filename.startswith(".") != True:
-            extension = path.filename.split(".")[-1] if "." in path.filename else ""
-            if path.isDirectory and path.filename not in ignored_directories:
-                print(basePath + "/" + path.filename)
 
-                if basePath == "/":
-                    loop_through_path(basePath + path.filename)
+            extension = path.filename.split(".")[-1] if "." in path.filename else ""
+
+            # if the path is a directory and isn't in the ignored directories in the config file then loop through that directory
+            if path.isDirectory and path.filename not in ignored_directories:
+                print(passed_path + "/" + path.filename)
+
+                if passed_path == "/":
+                    loop_through_path(passed_path + path.filename, SHARE_NAME)
 
                 else:
-                    loop_through_path(basePath + "/" + path.filename)
+                    loop_through_path(passed_path + "/" + path.filename, SHARE_NAME)
+
+            # If a path is a file and is a valid extenstions
             elif not extension in valid_extensions:
 
+                # get the month,year,day of the files create_time ISO timestamp
                 date_created = extract_month_year(format_timestamp(path.create_time))
                 print(date_created)
 
+                # Does the file creation year directory exist
+
                 if (
                     check_directory_exists(
-                        SHARE_NAME, f"{outputDirectory}/{date_created[1]}"
+                        SHARE_NAME, f"{output_directory}/{date_created[1]}"
                     )
                     == False
                 ):
                     create_new_directory(
-                        SHARE_NAME, f"{outputDirectory}/{date_created[1]}"
+                        SHARE_NAME, f"{output_directory}/{date_created[1]}"
                     )
+
+                # Does the file creation month directory exist
 
                 if (
                     check_directory_exists(
                         SHARE_NAME,
-                        f"{outputDirectory}/{date_created[1]}/{date_created[0]}",
-                    )
-                    == False
-                ):
-                    create_new_directory(
-                        SHARE_NAME,
-                        f"{outputDirectory}/{date_created[1]}/{date_created[0]}",
-                    )
-
-                if (
-                    check_directory_exists(
-                        SHARE_NAME,
-                        f"{outputDirectory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
+                        f"{output_directory}/{date_created[1]}/{date_created[0]}",
                     )
                     == False
                 ):
                     create_new_directory(
                         SHARE_NAME,
-                        f"{outputDirectory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
+                        f"{output_directory}/{date_created[1]}/{date_created[0]}",
                     )
 
-                try:
+                # Does the file creation day directory exist
 
-                    move_file(
+                if (
+                    check_directory_exists(
                         SHARE_NAME,
-                        f"{basePath}/{path.filename}",
-                        f"{outputDirectory}",
-                        date_created,
+                        f"{output_directory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
                     )
-
-                except:
-
-                    original_file_name = path.filename.split(".")[0]
-                    original_file_extension = path.filename.split(".")[-1]
-                    move_file(
+                    == False
+                ):
+                    create_new_directory(
                         SHARE_NAME,
-                        f"{basePath}/{path.filename}",
-                        f"{outputDirectory}/{date_created[1]}/{date_created[0]}/{date_created[2]}/{original_file_name}-copy",
+                        f"{output_directory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
                     )
 
-
-def get_if_test():
-    data = read_config()
-    isATest = False
-    path = ""
-    testCheck = data["test-directory"]
-    if testCheck != "":
-        path = testCheck
-        isATest = True
-
-    return [isATest, path]
+                move_file(
+                    SHARE_NAME,
+                    f"{passed_path}/{path.filename}",
+                    output_directory,
+                    path.filename,
+                    date_created,
+                )
 
 
-if __name__ == "__main__":
-    # Prepare terminal
-    os.system("cls||clear")
-
-    # Get important information
-
-    server_profiles = get_existing_server_profile(server_profiles)
-    ignored_directories = get_ignored_directories(ignored_directories)
-    outputDirectory = get_output_directory()
-
+def select_profile(server_profiles, SERVER_PROFILE):
     if len(server_profiles) == 0:
         server_profiles = create_new_server_profile(server_profiles)
     else:
@@ -338,26 +323,56 @@ if __name__ == "__main__":
             print("Choice out of range try again!")
             exit(0)
 
-        SERVER_NAME = server_profiles[profileChoice][0]
-        DOMAIN = server_profiles[profileChoice][3]
-        SHARE_NAME = server_profiles[profileChoice][4]
-        USERNAME = server_profiles[profileChoice][1]
-        PASSWORD = server_profiles[profileChoice][2]
+        SERVER_PROFILE.SERVER_NAME = server_profiles[profileChoice][0]
+        SERVER_PROFILE.DOMAIN = server_profiles[profileChoice][3]
+        SERVER_PROFILE.SHARE_NAME = server_profiles[profileChoice][4]
+        SERVER_PROFILE.USERNAME = server_profiles[profileChoice][1]
+        SERVER_PROFILE.PASSWORD = server_profiles[profileChoice][2]
 
-        conn = SMBConnection(
-            USERNAME, PASSWORD, "python_smb", SERVER_NAME, DOMAIN, use_ntlm_v2=True
-        )
-        conn.connect(SERVER_NAME, 445)
+        return SERVER_PROFILE
 
-        if check_directory_exists(SHARE_NAME, "/") == False:
-            create_new_directory(SHARE_NAME, outputDirectory)
 
-        inTest = get_if_test()
+def get_if_test():
+    data = read_config()
+    isATest = False
+    path = ""
+    testCheck = data["test-directory"]
+    if testCheck != "":
+        path = testCheck
+        isATest = True
 
-        if inTest:
-            loop_through_path(inTest[1])
-        else:
-            loop_through_path("/")
+    return [isATest, path]
 
-        #     )
-        conn.close()
+
+if __name__ == "__main__":
+    # Prepare terminal
+    os.system("cls||clear")
+
+    # Get important information
+
+    server_profiles = get_existing_server_profile(server_profiles)
+    ignored_directories = get_ignored_directories(ignored_directories)
+    output_directory = get_output_directory()
+
+    SERVER_PROFILE = select_profile(server_profiles, SERVER_PROFILE)
+
+    conn = SMBConnection(
+        SERVER_NAME.USERNAME,
+        SERVER_PROFILE.PASSWORD,
+        "python_smb",
+        SERVER_PROFILE.SERVER_NAME,
+        SERVER_PROFILE.DOMAIN,
+        use_ntlm_v2=True,
+    )
+    conn.connect(SERVER_PROFILE.SERVER_NAME, 445)
+
+    if check_directory_exists(SERVER_PROFILE.SHARE_NAME, "/") == False:
+        create_new_directory(SERVER_PROFILE.SHARE_NAME, output_directory)
+
+    inTest = get_if_test()
+
+    if inTest:
+        loop_through_path(inTest[1], SERVER_PROFILE.SHARE_NAME)
+    else:
+        loop_through_path("/", SERVER_PROFILE.SHARE_NAME)
+    conn.close()
