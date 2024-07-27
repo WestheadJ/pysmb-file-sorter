@@ -2,11 +2,13 @@
 A script to organize files by year, month, and date on a smb server.
 
 # Table of Contents
-1. [How To Run](#how-to-run)
+1. [How To Setup & Run](#how-to-setup--run)
 - [Installing Required Modules](#installing-required-modules)
 - [Creating & Setting Up The Config File](#creating--setting-up-the-config-file)
+- [Path Information For Config](#path-information-for-config)
+- [Server Profiles](#server-profiles)
 
-# How To Run
+# How To Setup & Run
 
 
 ## Installing Required Modules
@@ -45,3 +47,52 @@ I purposefully have not added the configs file I use. However I will explain how
     "valid-extensions":[".jpg",".JPG",".png",".PNG"]
 }
 ```
+
+## Path Information For Config
+This script needs a folder to move the files to. This needs to be the exact path on the drive, it also needs the parent directory to be the same as your indicated ```"SHARE_NAME"```.
+### Example 1
+Take this as the config file example:
+``` json
+{
+         "profiles":
+         [
+            {
+            "SERVER_NAME": "smbserver",
+            "USERNAME": "user1",
+            "PASSWORD": "password",
+            "DOMAIN": "smbserver",
+            "SHARE_NAME": "main/smbserver"
+            }
+        ],
+        "output-directory":"Sorted"
+}
+```
+
+The ```SHARE_NAME``` is the SHARE folder, and the ```output-directory``` is a folder called "Sorted" in the share path so this would look like : ```smb://smbserver/main/smbserver/Sorted``` as a file link.
+
+## Server Profiles
+A profile consists of a:
+- ```SERVER_NAME```
+- ```USERNAME```
+- ```PASSWORD```
+- ```DOMAIN```
+- ```SHARE_NAME```
+
+ ### - ```SERVER_NAME```
+The server name is dictated as what the machine name or network name of the machine name is. 
+
+For example my raspberry pi comes under it's IP which also is linked to the [```DOMAIN```](#--domain). But my truenas server it's ```SHARE_NAME``` is ```truenas``` but it can be accessed by it's IP or the term truenas in it's [```DOMAIN```](#--domain) so you may have to play about with the different options.
+
+### - ```USERNAME```
+This has to be a user to the machine, this could be a root user or if it's a user specific to the share.
+
+### - ```PASSWORD``` 
+This is the password that you will use with the [```USERNAME```](#--username) to login to that Share.
+
+### - ```DOMAIN```
+This is the server address that it will need to connect to it, wether this is the IP of the machine or the actual smb address like I mentioned in [```SERVER_NAME```](#--server_name)
+
+### - ```SHARE_NAME```
+This is the name/display name of the Share folder. 
+
+For example in ```smbd.config``` you may have a share called ```James``` but it could be linked to a folder called ```smbserver/James-Share``` the ```SHARE_NAME``` may look like this ```"SHARE_NAME":"James:"```
