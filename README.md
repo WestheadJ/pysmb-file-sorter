@@ -2,9 +2,9 @@
 A script to organize files by year, month, and date on a smb server.
 
 # Table of Contents
-- [How To Run](#how-to-run)
-    - 
-    -
+1. [How To Run](#how-to-run)
+- [Installing Required Modules](#installing-required-modules)
+- [Creating & Setting Up The Config File](#creating--setting-up-the-config-file)
 
 # How To Run
 
@@ -20,7 +20,7 @@ If you don't have pip or your system cannot run the command try, you will need t
 ```pip3 install -r requirements.txt```
 > when cloning the repository, ```requirements.txt``` should be in the base directory of the project, if this does not work you may need to reference the path to the requirements file i.e ```/downloads/pysmb-file-sorter/requirements.txt```
 
-# Config File
+## Creating & Setting Up The Config File
 I purposefully have not added the configs file I use. However I will explain how to set it up to start with.
 
 ### Steps To Create Config File
@@ -32,7 +32,6 @@ I purposefully have not added the configs file I use. However I will explain how
     "profiles":[],
     "ignored-directories":[],
     "output-directory":"",
-    "test-directory":"",
     "valid-extensions":[]
 }
 ```
@@ -43,8 +42,6 @@ I purposefully have not added the configs file I use. However I will explain how
     "profiles":[],
     "ignored-directories":[],
     "output-directory":"/path/to/move/files/to",
-    "test-directory":"/path/to/look at the test-directory",
     "valid-extensions":[".jpg",".JPG",".png",".PNG"]
 }
 ```
-> leave ```"test-directory"``` empty if you don't want to test moving your files as it's for 
