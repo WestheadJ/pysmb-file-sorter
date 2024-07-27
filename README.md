@@ -79,7 +79,7 @@ A profile consists of a:
 - ```SHARE_NAME```
 
  ### - ```SERVER_NAME```
-The server name is dictated as what the machine name or network name of the machine name is. 
+The server name is dictated as what the machine name or network name of the machine is. 
 
 For example my raspberry pi comes under it's IP which also is linked to the [```DOMAIN```](#--domain). But my truenas server it's ```SHARE_NAME``` is ```truenas``` but it can be accessed by it's IP or the term truenas in it's [```DOMAIN```](#--domain) so you may have to play about with the different options.
 
