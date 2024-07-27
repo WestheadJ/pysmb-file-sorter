@@ -14,7 +14,10 @@ ignored_directories = []
 
 valid_extensions = []
 
-isTest = False
+log = logging.getLogger("my_logger")
+
+# 2. Set the logging level
+log.setLevel(logging.DEBUG)
 
 
 class SERVER_PROFILE:
@@ -116,7 +119,6 @@ def create_new_server_profile(server_profiles):
             "profiles": profiles,
             "ignored-directories": ignored_directories,
             "output-directory": output_directory,
-            "test-directory": "",
             "valid-extensions": valid_extensions,
         }
         write_config(data)
@@ -332,18 +334,6 @@ def select_profile(server_profiles, SERVER_PROFILE):
         return SERVER_PROFILE
 
 
-def get_if_test():
-    data = read_config()
-    isATest = False
-    path = ""
-    testCheck = data["test-directory"]
-    if testCheck != "":
-        path = testCheck
-        isATest = True
-
-    return [isATest, path]
-
-
 if __name__ == "__main__":
     # Prepare terminal
     os.system("cls||clear")
@@ -357,7 +347,7 @@ if __name__ == "__main__":
     SERVER_PROFILE = select_profile(server_profiles, SERVER_PROFILE)
 
     conn = SMBConnection(
-        SERVER_NAME.USERNAME,
+        SERVER_PROFILE.USERNAME,
         SERVER_PROFILE.PASSWORD,
         "python_smb",
         SERVER_PROFILE.SERVER_NAME,
@@ -369,10 +359,5 @@ if __name__ == "__main__":
     if check_directory_exists(SERVER_PROFILE.SHARE_NAME, "/") == False:
         create_new_directory(SERVER_PROFILE.SHARE_NAME, output_directory)
 
-    inTest = get_if_test()
-
-    if inTest:
-        loop_through_path(inTest[1], SERVER_PROFILE.SHARE_NAME)
-    else:
-        loop_through_path("/", SERVER_PROFILE.SHARE_NAME)
+        loop_through_path("Test-Folder", SERVER_PROFILE.SHARE_NAME)
     conn.close()
