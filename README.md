@@ -96,3 +96,14 @@ This is the server address that it will need to connect to it, wether this is th
 This is the name/display name of the Share folder. 
 
 For example in ```smbd.config``` you may have a share called ```James``` but it could be linked to a folder called ```smbserver/James-Share``` the ```SHARE_NAME``` may look like this ```"SHARE_NAME":"James:"```
+
+> [```SERVER_NAME```](#--server_name) & [```DOMAIN```](#--domain) when it is the IP should look like this:
+```json
+{
+    "SERVER_NAME": "127.0.0.1",
+    "USERNAME": "testuser",
+    "PASSWORD": "pysmbtestuser",
+    "DOMAIN": "127.0.0.1",
+    "SHARE_NAME": "TESTSHARE"
+}
+```
