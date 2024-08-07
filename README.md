@@ -70,6 +70,27 @@ Take this as the config file example:
 
 The ```SHARE_NAME``` is the SHARE folder, and the ```output-directory``` is a folder called "Sorted" in the share path so this would look like : ```smb://smbserver/main/smbserver/Sorted``` as a file link.
 
+### Example 2
+
+Take this as the config file example:
+``` json
+{
+         "profiles":
+         [
+            {
+            "SERVER_NAME": "server",
+            "USERNAME": "user1",
+            "PASSWORD": "password",
+            "DOMAIN": "192.168.1.229",
+            "SHARE_NAME": "james"
+            }
+        ],
+        "output-directory":"Sorted"
+}
+```
+
+The ```SHARE_NAME``` is the SHARE folder, and the ```output-directory``` is a folder called "Sorted" in the share path so this would look like : ```smb://192.168.1.229/james/Sorted``` as a file link.
+
 ## Server Profiles
 A profile consists of a:
 - ```SERVER_NAME```
@@ -107,3 +128,23 @@ For example in ```smbd.config``` you may have a share called ```James``` but it 
     "SHARE_NAME": "TESTSHARE"
 }
 ```
+
+# How It Works
+
+I initially didn't know where to start with this and had a lot of thinking to do.
+> It's still being worked on as of "Aug 7 2024" 
+
+So when the script is ran it will try to find the config file. It will then strip the information to the different parts. It needs a server profile to connect to first, so there's the option to create a new one or select an already existing one. 
+
+Once a profile is chosen, I attempt a connection, if it fails I prompt the user with the error message that the connection was broken and they need to try again. If successful, it will then check if there is an output directory corelating to the one in the config file. If it doesn't exist it creates a new folder.
+
+Next it will then loop through the path given, it's a deep first search on the subject of folders.
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+```
+
+
