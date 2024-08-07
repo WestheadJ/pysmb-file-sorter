@@ -140,6 +140,8 @@ Once a profile is chosen, I attempt a connection, if it fails I prompt the user 
 
 Next it will then loop through the path given, it's a deep first search on the subject of folders.
 
+### For Example:
+
 ```mermaid
 graph TD;
     A-->B;
@@ -152,5 +154,11 @@ graph TD;
     H-->I;
     H-->J;
 ```
+- Node A is our root node for example Sorted in this URL: ```smb://smbserver/main/smbserver/Sorted```
 
+- My algorithm will search all files, if the file matches to the conditions it will be moved however if it's a folder it will search it and keep going down it.
 
+- It will then back out and carry on from where it left off in the parent node to the child you wer last in.
+
+Finally the program clears up any empty folders that it has left
+> As of 7th of August 2024 this feature does not exist and is under design and development
