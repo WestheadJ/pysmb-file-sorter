@@ -2,14 +2,19 @@
 A script to organize files by year, month, and date on a smb server.
 
 # Table of Contents
-1. [How To Setup & Run](#how-to-setup--run)
-- [Installing Required Modules](#installing-required-modules)
-- [Creating & Setting Up The Config File](#creating--setting-up-the-config-file)
-- [Path Information For Config](#path-information-for-config)
-- [Server Profiles](#server-profiles)
+1. [Change Log](#change-log)
+2. [How To Setup & Run](#how-to-setup--run)
+    - [Installing Required Modules](#installing-required-modules)
+    - [Creating & Setting Up The Config File](#creating--setting-up-the-config-file)
+    - [Path Information For Config](#path-information-for-config)
+    - [Server Profiles](#server-profiles)
+3. [How It Works](#how-it-works)
+4. [Dependencies](#dependencies)
+
+# Change Log
+To be updated...
 
 # How To Setup & Run
-
 
 ## Installing Required Modules
 Use to install required modules:
@@ -162,3 +167,17 @@ graph TD;
 
 Finally the program clears up any empty folders that it has left
 > As of 7th of August 2024 this feature does not exist and is under design and development
+
+# Dependencies
+### 3rd Party
+- [pysmb](https://miketeo.net/blog/projects/pysmb) package is used for connecting and using the rename method to "move" files. 
+
+### Lib Packages
+- [getpass](https://docs.python.org/3/library/getpass.html)
+- [datetime](https://docs.python.org/3/library/datetime.html#module-datetime)
+- [os](https://docs.python.org/3/library/os.html#module-os)
+- [json](https://docs.python.org/3/library/json.html#module-json)
+- [logging](https://docs.python.org/3/library/logging.html#module-logging)
+- [time](https://docs.python.org/3/library/time.html#module-time)
+- [calendar](https://docs.python.org/3/library/calendar.html#module-calendar)
+- [uuid](https://docs.python.org/3/library/uuid.html#module-uuid)
