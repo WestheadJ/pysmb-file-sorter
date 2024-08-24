@@ -2,14 +2,14 @@
 A script to organize files by year, month, and date on a smb server.
 
 # Table of Contents
-1. [Change Log](#change-log)
-2. [How To Setup & Run](#how-to-setup--run)
-    - [Installing Required Modules](#installing-required-modules)
+### 1. [Change Log](#change-log)
+### 2. [How To Setup & Run](#how-to-setup--run)
+- [Installing Required Modules](#installing-required-modules)
     - [Creating & Setting Up The Config File](#creating--setting-up-the-config-file)
     - [Path Information For Config](#path-information-for-config)
     - [Server Profiles](#server-profiles)
-3. [How It Works](#how-it-works)
-4. [Dependencies](#dependencies)
+### 3. [How It Works](#how-it-works)
+### 4. [Dependencies](#dependencies)
 
 # Change Log
 To be updated...
