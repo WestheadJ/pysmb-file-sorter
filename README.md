@@ -148,7 +148,7 @@ Next it will then loop through the path given, it's a deep first search on the s
 ### For Example:
 
 ```mermaid
-graph TD;
+
     A-->B;
     A-->C;
     B-->D;
