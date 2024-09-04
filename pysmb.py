@@ -19,6 +19,8 @@ log = logging.getLogger("my_logger")
 # 2. Set the logging level
 log.setLevel(logging.DEBUG)
 
+foldersVisited = []
+
 
 class SERVER_PROFILE:
     SERVER_NAME = ""
@@ -72,11 +74,7 @@ Are these details correct?"""
 def check_directory_exists(share, directory_path):
     try:
         paths = conn.listPath(share, directory_path)
-        dir_exists = False
-        for path in paths:
-            if path.filename == directory_path:
-                dir_exists = True
-        return dir_exists
+        return True
     except:
         return False
 
@@ -122,22 +120,24 @@ def create_new_server_profile(server_profiles):
             "valid-extensions": valid_extensions,
         }
         write_config(data)
+        return server_profiles
     else:
         print("Can't connect!")
 
 
 def write_config(data):
-    with open("/Users/james/Desktop/pysmb/smb-configs.json", "w") as profilesFile:
+    with open("./smb-configs.json", "w") as profilesFile:
         json.dump(data, profilesFile, indent=4)
 
 
 def read_config():
     data = ""
-    with open("/Users/james/Desktop/pysmb/smb-configs.json", "r") as profilesFile:
+    with open("./smb-configs.json", "r") as profilesFile:
         data = json.load(profilesFile)
     return data
 
 
+# TODO: create an edit profile
 # def edit_existing_server_profile():
 
 
@@ -200,7 +200,8 @@ def create_new_directory(share, new_path_name):
     try:
         conn.createDirectory(share, new_path_name)
         print("Created new directory")
-    except:
+    except Exception as e:
+        print(e)
         print("Cannot create a new directory")
 
 
@@ -325,6 +326,8 @@ def select_profile(server_profiles, SERVER_PROFILE):
             print("Choice out of range try again!")
             exit(0)
 
+        profileChoice = len(server_profiles) - 1
+
         SERVER_PROFILE.SERVER_NAME = server_profiles[profileChoice][0]
         SERVER_PROFILE.DOMAIN = server_profiles[profileChoice][3]
         SERVER_PROFILE.SHARE_NAME = server_profiles[profileChoice][4]
@@ -356,8 +359,9 @@ if __name__ == "__main__":
     )
     conn.connect(SERVER_PROFILE.SERVER_NAME, 445)
 
-    if check_directory_exists(SERVER_PROFILE.SHARE_NAME, "/") == False:
+    if check_directory_exists(SERVER_PROFILE.SHARE_NAME, output_directory) == False:
+
         create_new_directory(SERVER_PROFILE.SHARE_NAME, output_directory)
 
-        loop_through_path("Test-Folder", SERVER_PROFILE.SHARE_NAME)
+    loop_through_path("Test-Folder", SERVER_PROFILE.SHARE_NAME)
     conn.close()
