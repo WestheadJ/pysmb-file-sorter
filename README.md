@@ -168,6 +168,27 @@ graph TD;
 Finally the program clears up any empty folders that it has left
 > As of 7th of August 2024 this feature does not exist and is under design and development
 
+# Contributing
+There are different ways you can contribute and help me develop this.
+You can:
+- Suggest features
+- Help with issues
+- Test and try to break and create issues highlighting bugs
+- Share With Friends!
+
+## Suggesting features
+If you can think of ways to improve, create an issue on the Issues page following the pre-created template. If this is a solid feature I will create a branch for it and keep the issue open until obviously it is completed to satisfaction.
+
+## Help with issues
+I am the creator and as of now the only contributor, if you can help in any way the help is there. The way the repo is laid out is as so.
+There are 3 branches
+- main
+- test
+- dev
+With each issue, a new branch will be created for each issue. If you add anything as in say you finish a function or change a function, commit this to the branch. Then at the end of a coding session, or when finish with your idea create a pull request to merge you changes into <u>**DEV**</u>. 
+
+Finally when the issue is to satisfaction a new pull request needs to be made to merge the issue branch into <u>**TEST**</u>, this pull request needs to be tagged as needs testing and link the original issue in the pull request with the changes and any removals, including any dependencies that are added or removed wether they be 3rd party or library dependencies.
+
 # Dependencies
 ### 3rd Party
 - [pysmb](https://miketeo.net/blog/projects/pysmb) package is used for connecting and using the rename method to "move" files. 
