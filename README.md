@@ -32,6 +32,7 @@ I purposefully have not added the configs file I use. However I will explain how
 
 ### Steps To Create Config File
 1. Create a new configs file in the same folder as the script file and name it ```smb-configs.json```.
+> If you want to put this in a configs folder, you will want to change the ```write_config(data)``` and the ```read_config()``` functions.
 2. The layout should consist of this
 
 ``` json
