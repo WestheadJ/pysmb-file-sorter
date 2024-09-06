@@ -186,6 +186,7 @@ There are 3 branches
 - main
 - test
 - dev
+
 With each issue, a new branch will be created for each issue. If you add anything as in say you finish a function or change a function, commit this to the branch. Then at the end of a coding session, or when finish with your idea create a pull request to merge you changes into <u>**DEV**</u>. 
 
 Finally when the issue is to satisfaction a new pull request needs to be made to merge the issue branch into <u>**TEST**</u>, this pull request needs to be tagged as needs testing and link the original issue in the pull request with the changes and any removals, including any dependencies that are added or removed wether they be 3rd party or library dependencies.
