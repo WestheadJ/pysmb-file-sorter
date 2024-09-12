@@ -21,6 +21,8 @@ log.setLevel(logging.DEBUG)
 
 foldersVisited = []
 
+conn = ""
+
 
 class SERVER_PROFILE:
     SERVER_NAME = ""
@@ -71,7 +73,7 @@ Are these details correct?"""
     return False
 
 
-def check_directory_exists(share, directory_path):
+def check_directory_exists(share, directory_path, conn):
     try:
         paths = conn.listPath(share, directory_path)
         return True
@@ -80,7 +82,7 @@ def check_directory_exists(share, directory_path):
 
 
 def check_server_profile_connection(
-    SERVER_NAME, USERNAME, PASSWORD, DOMAIN, SHARE_NAME
+    SERVER_NAME, USERNAME, PASSWORD, DOMAIN, SHARE_NAME, conn
 ):
     try:
         conn = SMBConnection(
@@ -126,13 +128,13 @@ def create_new_server_profile(server_profiles):
 
 
 def write_config(data):
-    with open("./smb-configs.json", "w") as profilesFile:
+    with open("smb-configs.json", "w") as profilesFile:
         json.dump(data, profilesFile, indent=4)
 
 
 def read_config():
     data = ""
-    with open("./smb-configs.json", "r") as profilesFile:
+    with open("smb-configs.json", "r") as profilesFile:
         data = json.load(profilesFile)
     return data
 
@@ -195,7 +197,7 @@ def get_ignored_directories(ignored_directories):
     return ignored_directories
 
 
-def create_new_directory(share, new_path_name):
+def create_new_directory(share, new_path_name, conn):
     print("Creating new directory: ", new_path_name)
     try:
         conn.createDirectory(share, new_path_name)
@@ -205,7 +207,9 @@ def create_new_directory(share, new_path_name):
         print("Cannot create a new directory")
 
 
-def move_file(SHARE_NAME, original_file_path, output_directory, filename, timestamp):
+def move_file(
+    SHARE_NAME, original_file_path, output_directory, filename, timestamp, conn
+):
     log.debug(f'moving file at: "{original_file_path}"')
 
     random_uuid = uuid.uuid4()
@@ -223,7 +227,7 @@ def move_file(SHARE_NAME, original_file_path, output_directory, filename, timest
         conn.rename(SHARE_NAME, original_file_path, f"{new_path}/copy-{new_file_name}")
 
 
-def loop_through_path(passed_path, SHARE_NAME):
+def loop_through_path(passed_path, SHARE_NAME, conn):
 
     print(f"\nPassed base path: {passed_path}")
 
@@ -240,10 +244,12 @@ def loop_through_path(passed_path, SHARE_NAME):
                 print(passed_path + "/" + path.filename)
 
                 if passed_path == "/":
-                    loop_through_path(passed_path + path.filename, SHARE_NAME)
+                    loop_through_path(passed_path + path.filename, SHARE_NAME, conn)
 
                 else:
-                    loop_through_path(passed_path + "/" + path.filename, SHARE_NAME)
+                    loop_through_path(
+                        passed_path + "/" + path.filename, SHARE_NAME, conn
+                    )
 
             # If a path is a file and is a valid extenstions
             elif not extension in valid_extensions:
@@ -258,10 +264,11 @@ def loop_through_path(passed_path, SHARE_NAME):
                     check_directory_exists(
                         SHARE_NAME, f"{output_directory}/{date_created[1]}"
                     )
-                    == False
+                    == False,
+                    conn,
                 ):
                     create_new_directory(
-                        SHARE_NAME, f"{output_directory}/{date_created[1]}"
+                        SHARE_NAME, f"{output_directory}/{date_created[1]}", conn
                     )
 
                 # Does the file creation month directory exist
@@ -271,11 +278,13 @@ def loop_through_path(passed_path, SHARE_NAME):
                         SHARE_NAME,
                         f"{output_directory}/{date_created[1]}/{date_created[0]}",
                     )
-                    == False
+                    == False,
+                    conn,
                 ):
                     create_new_directory(
                         SHARE_NAME,
                         f"{output_directory}/{date_created[1]}/{date_created[0]}",
+                        conn,
                     )
 
                 # Does the file creation day directory exist
@@ -285,11 +294,13 @@ def loop_through_path(passed_path, SHARE_NAME):
                         SHARE_NAME,
                         f"{output_directory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
                     )
-                    == False
+                    == False,
+                    conn,
                 ):
                     create_new_directory(
                         SHARE_NAME,
                         f"{output_directory}/{date_created[1]}/{date_created[0]}/{date_created[2]}",
+                        conn,
                     )
 
                 move_file(
@@ -298,6 +309,7 @@ def loop_through_path(passed_path, SHARE_NAME):
                     output_directory,
                     path.filename,
                     date_created,
+                    conn,
                 )
 
 
@@ -337,6 +349,16 @@ def select_profile(server_profiles, SERVER_PROFILE):
         return SERVER_PROFILE
 
 
+def run_move(conn):
+    if (
+        check_directory_exists(SERVER_PROFILE.SHARE_NAME, output_directory, conn)
+        == False
+    ):
+        create_new_directory(SERVER_PROFILE.SHARE_NAME, output_directory, conn)
+
+    loop_through_path("Test-Folder", SERVER_PROFILE.SHARE_NAME, conn)
+
+
 if __name__ == "__main__":
     # Prepare terminal
     os.system("cls||clear")
@@ -347,21 +369,36 @@ if __name__ == "__main__":
     ignored_directories = get_ignored_directories(ignored_directories)
     output_directory = get_output_directory()
 
-    SERVER_PROFILE = select_profile(server_profiles, SERVER_PROFILE)
+    print("Connected to selected profile \n")
 
-    conn = SMBConnection(
-        SERVER_PROFILE.USERNAME,
-        SERVER_PROFILE.PASSWORD,
-        "python_smb",
-        SERVER_PROFILE.SERVER_NAME,
-        SERVER_PROFILE.DOMAIN,
-        use_ntlm_v2=True,
+    print(
+        """What script would you like to use? (Use the number)
+        0. Quit
+        1. Move Files (No clean up)
+        2. Move Files (with clean up)
+        3. Copy Files
+        """
     )
-    conn.connect(SERVER_PROFILE.SERVER_NAME, 445)
+    while True:
+        script_choice = input("Enter: ")
+        if script_choice == 0:
+            exit(0)
+        elif script_choice == 1:
+            SERVER_PROFILE = select_profile(server_profiles, SERVER_PROFILE)
 
-    if check_directory_exists(SERVER_PROFILE.SHARE_NAME, output_directory) == False:
-
-        create_new_directory(SERVER_PROFILE.SHARE_NAME, output_directory)
-
-    loop_through_path("Test-Folder", SERVER_PROFILE.SHARE_NAME)
-    conn.close()
+            conn = SMBConnection(
+                SERVER_PROFILE.USERNAME,
+                SERVER_PROFILE.PASSWORD,
+                "python_smb",
+                SERVER_PROFILE.SERVER_NAME,
+                SERVER_PROFILE.DOMAIN,
+                use_ntlm_v2=True,
+            )
+            conn.connect(SERVER_PROFILE.SERVER_NAME, 445)
+            run_move(conn)
+        elif script_choice == 2:
+            print("")
+        elif script_choice == 3:
+            print("")
+        else:
+            print("Not an option please try again")
