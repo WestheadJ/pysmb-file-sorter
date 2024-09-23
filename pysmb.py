@@ -139,8 +139,17 @@ def read_config():
     return data
 
 
-# TODO: create an edit profile
-# def edit_existing_server_profile():
+# TODO: create an edit profile function
+# def edit_existing_server_profile(server_profiles):
+
+# TODO: create a delete profile function
+# def delete_existing_server_profile(server_profiles):
+
+# TODO: create a copy function
+# def copy():
+
+# TODO: create a move with copy function
+# def move_with_copy():
 
 
 def get_existing_server_profile(server_profiles):
@@ -251,7 +260,7 @@ def loop_through_path(passed_path, SHARE_NAME, conn):
                         passed_path + "/" + path.filename, SHARE_NAME, conn
                     )
 
-            # If a path is a file and is a valid extenstions
+            # If a path is a file and is a valid extensions
             elif not extension in valid_extensions:
 
                 # get the month,year,day of the files create_time ISO timestamp
@@ -380,7 +389,7 @@ if __name__ == "__main__":
         """
     )
     while True:
-        script_choice = input("Enter: ")
+        script_choice = int(input("Enter: "))
         if script_choice == 0:
             exit(0)
         elif script_choice == 1:
